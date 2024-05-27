@@ -1,31 +1,32 @@
-# Version of Docker-compose for this Flask Load balancing application
 version: '4'
 services:
-  # Add the Flask application Service
   app:
-  # Location of the Flask Application dockerfile
     build: 
-      context: app
+      context: ./app
       dockerfile: Dockerfile.flask  # The Dockerfile for the custom Nginx image
     image: webapp
     #container_name: test-web-app
     ports:
-       # Flask application Host port: Flask Container port
       - '5000'
-    scale: 3
-  # nginx service
+    deploy:
+      replicas: 3
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+    command: flask run --host=0.0.0.0
+
   nginx:
     build:
-      context: nginx
+      context: ./nginx
       dockerfile: Dockerfile.nginx  # The Dockerfile for the custom Nginx image
     container_name: nginx
-    #image: nginx:latest
     #container_name: nginx
     ports:
       - "8080:80"
     volumes:
       - ./nginx/nginx.tmpl:/etc/nginx/nginx.tmpl
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /var/run/docker.pid:/tmp/docker.sock:ro
     command: /bin/bash -c "while sleep 1; do docker-gen /etc/nginx/nginx.tmpl /etc/nginx/conf.d/default.conf && nginx -s reload; done"
     depends_on:
       - app
