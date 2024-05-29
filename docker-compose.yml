@@ -7,36 +7,60 @@ services:
       dockerfile: Dockerfile.flask  # The Dockerfile for the custom app
     image: webapp
     container_name: app1
+    volumes:
+      - ./app/app.py:/app/app.py
     networks:
       - app-network
     environment:
+      - CONTAINER_NAME=app1
       - FLASK_APP=app.py
       - FLASK_ENV=production
     command: flask run --host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   app2:
     build: 
       context: ./app
       dockerfile: Dockerfile.flask  # The Dockerfile for the custom app
     image: webapp
     container_name: app2
+    volumes:
+      - ./app/app.py:/app/app.py
     networks:
       - app-network
     environment:
+      - CONTAINER_NAME=app2
       - FLASK_APP=app.py
       - FLASK_ENV=production
     command: flask run --host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
   app3:
     build: 
       context: ./app
       dockerfile: Dockerfile.flask  # The Dockerfile for the custom app
     image: webapp
     container_name: app3
+    volumes:
+      - ./app/app.py:/app/app.py
     networks:
       - app-network
     environment:
+      - CONTAINER_NAME=app3
       - FLASK_APP=app.py
       - FLASK_ENV=production
     command: flask run --host=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx:
     image: nginx:alpine
@@ -47,6 +71,10 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - app-network
+    depends_on:
+      - app1
+      - app2
+      - app3
 
 networks:
   app-network:
