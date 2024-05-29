@@ -1,7 +1,7 @@
 # Dockerfile for Nginx with docker-gen and supervisord
 FROM nginx:latest
 
-RUN apt-get update && apt-get install -y wget supervisor \
+RUN apt-get update && apt-get install -y wget supervisor psutils\
     && wget https://github.com/jwilder/docker-gen/releases/download/0.7.4/docker-gen-linux-amd64-0.7.4.tar.gz \
     && tar -C /usr/local/bin -xzf docker-gen-linux-amd64-0.7.4.tar.gz \
     && rm docker-gen-linux-amd64-0.7.4.tar.gz \
